@@ -1,0 +1,145 @@
+{
+	"info": {
+		"_postman_id": "7570f528-09e4-45a8-868b-5b0be24f8c09",
+		"name": "todo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4818623"
+	},
+	"item": [
+		{
+			"name": "微信ID登录 /login/wx/dsadas",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{todoUrl}}/users/login/wx/dsadas",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"users",
+						"login",
+						"wx",
+						"dsadas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "创建task",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Task Title\",\r\n  \"curDay\": \"2023-07-26\",\r\n  \"taskTime\": \"2023-07-26T12:34:56\",\r\n  \"description\": \"Task description (optional)\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{todoUrl}}/lists/create",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"lists",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "更新task",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Task Title one\",\r\n   \"curDay\": \"2023-07-26\",\r\n  \"taskTime\": \"2023-07-27T12:34:56\",\r\n  \"description\": \"Task description (optional) one\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{todoUrl}}/lists/1",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"lists",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "获取单个task",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{todoUrl}}/lists/1",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"lists",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "获取所有task",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{todoUrl}}/lists/all/1",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"lists",
+						"all",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
