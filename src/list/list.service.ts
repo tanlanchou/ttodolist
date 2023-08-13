@@ -17,6 +17,9 @@ export class ListService {
       where: {
         userId,
       },
+      order: {
+        createTime: 'DESC', // 按 createTime 降序排序
+      },
       skip: (options.page - 1) * options.pageSize,
       take: options.pageSize,
     });
@@ -47,7 +50,14 @@ export class ListService {
     await this.listRepository.update(id, list);
   }
 
-  async remove(id: number): Promise<void> {
-    await this.listRepository.delete(id);
+  async remove(id: number, userId = 0): Promise<void> {
+    if (userId == 0) {
+      await this.listRepository.delete(id);
+    } else {
+      await this.listRepository.delete({
+        id,
+        userId,
+      });
+    }
   }
 }

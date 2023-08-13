@@ -25,6 +25,7 @@ export class TaskCronService {
   @Cron('0 * * * * *')
   async handleCron() {
     console.log('执行了任务');
+    return;
     const currentTime = new Date().getTime();
     const maxDiff = 59; //秒
     const tasks = await this.listService.findAllNormalTask();

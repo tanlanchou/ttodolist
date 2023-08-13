@@ -20,6 +20,10 @@ import { TypeOrmConfigService } from './connect/typeof.config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskCronService } from './corn/task';
 import { MailService } from './common/mail.service';
+import { TempTokenService } from './auth/temp.token.service';
+import { TempTokenGuard } from './guard/temp.token.guard';
+import { ValidateEmailPipe } from './pipe/validate.email.pipe';
+import { LoginEmailController } from './login.email';
 
 @Module({
   imports: [
@@ -35,8 +39,14 @@ import { MailService } from './common/mail.service';
     TypeOrmModule.forFeature([User, List]),
     ScheduleModule.forRoot(),
   ],
-  controllers: [AppController, UserController, ListController],
+  controllers: [
+    AppController,
+    UserController,
+    ListController,
+    LoginEmailController,
+  ],
   providers: [
+    AuthGuard,
     HttpService,
     ConfigService,
     AppService,
@@ -47,9 +57,12 @@ import { MailService } from './common/mail.service';
     WeChatService,
     JwtAuthModule,
     JwtAuthGuard,
-    AuthGuard,
     TaskCronService,
     MailService,
+    TempTokenService,
+    TempTokenGuard,
+    ValidateEmailPipe,
+    LoginEmailController,
   ],
 })
 export class AppModule {}

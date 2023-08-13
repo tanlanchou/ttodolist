@@ -11,6 +11,7 @@ import {
   Req,
   HttpException,
   HttpStatus,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { ListService } from './list.service';
 import { List } from '../connect/list.entity';
@@ -28,22 +29,31 @@ export class ListController {
     private readonly jwtCommonService: JwtCommonService,
   ) {}
 
-  @Get('/all/:page')
-  async findAll(@Param('page') page: number, @Req() request): Promise<List[]> {
-    const userId = request.user.id;
+  @Get('/all/:page/:pageSize')
+  async findAll(
+    @Param('page', new DefaultValuePipe(1)) page: number,
+    @Param('pageSize', new DefaultValuePipe(25)) pageSize: number,
+    @Req() request,
+  ): Promise<List[]> {
+    const userId = request.user && request.user.id;
+    if (!userId) throw new HttpException('401', HttpStatus.UNAUTHORIZED);
+
     return this.listService.findAll(userId, {
       page,
-      pageSize: 25,
+      pageSize,
     });
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number, @Req() request): Promise<List> {
+    const userId = request.user && request.user.id;
+    if (!userId) throw new HttpException('401', HttpStatus.UNAUTHORIZED);
+
     const result = await this.listService.findOne(id);
     if (result === null) throw new HttpException('404', HttpStatus.NOT_FOUND);
 
-    if (result.userId !== request.user.id) {
-      throw new HttpException('Forbidden', HttpStatus.NOT_FOUND);
+    if (result.userId !== userId) {
+      throw new HttpException('401', HttpStatus.UNAUTHORIZED);
     }
 
     return result;
@@ -51,12 +61,15 @@ export class ListController {
 
   @Post('create')
   async create(@Body() task: TaskDto, @Req() request): Promise<List> {
+    const userId = request.user && request.user.id;
+    if (!userId) throw new HttpException('401', HttpStatus.UNAUTHORIZED);
+
     const list = new List();
     list.title = task.title;
     list.curDay = task.curDay;
     list.description = task.description;
     list.taskTime = task.taskTime;
-    list.userId = request.user.id;
+    list.userId = userId;
 
     return await this.listService.create(list);
   }
@@ -66,22 +79,29 @@ export class ListController {
     @Param('id') id: number,
     @Body() list: TaskDto,
     @Req() request,
-  ): Promise<void> {
+  ): Promise<List> {
+    const userId = request.user && request.user.id;
+    if (!userId) throw new HttpException('401', HttpStatus.UNAUTHORIZED);
+
     const task = await this.listService.findOne(id);
     if (task === null) throw new HttpException('404', HttpStatus.NOT_FOUND);
 
     if (task.userId !== request.user.id)
-      throw new HttpException('Forbidden', HttpStatus.NOT_FOUND);
+      throw new HttpException('401', HttpStatus.UNAUTHORIZED);
 
     const entity = new List();
     for (const key in list) {
       entity[key] = list[key];
     }
     await this.listService.update(id, entity);
+    return task;
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number): Promise<void> {
-    return this.listService.remove(id);
+  async remove(@Param('id') id: number, @Req() request): Promise<void> {
+    const userId = request.user && request.user.id;
+    if (!!userId) {
+      return this.listService.remove(id, userId);
+    }
   }
 }

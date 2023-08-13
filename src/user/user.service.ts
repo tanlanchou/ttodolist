@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../connect/user.entity';
+import { UserStatus } from 'src/common/enmu';
 
 @Injectable()
 export class UserService {
@@ -11,8 +12,20 @@ export class UserService {
   ) {}
 
   async createUser(userData: Partial<User>): Promise<User> {
+    if (!userData.activeTime) userData.activeTime = new Date();
+    if (!userData.createTime) userData.createTime = new Date();
+    if (!userData.name) userData.name = this.generateRandomName();
+    if (!userData.status) userData.status = UserStatus.disable;
+
     const newUser = this.userRepository.create(userData);
     return this.userRepository.save(newUser);
+  }
+
+  private generateRandomName(): string {
+    const prefix = 'User';
+    const randomSuffix = Math.floor(Math.random() * 100000).toString();
+    const username = prefix + randomSuffix.padStart(5, '0');
+    return username;
   }
 
   async findAllUsers(): Promise<User[]> {
@@ -23,6 +36,10 @@ export class UserService {
     return this.userRepository.findOne({ where: { id } });
   }
 
+  async findUserByEmailPWD(email: string, pwd: string) {
+    return this.userRepository.findOne({ where: { email, pwd } });
+  }
+
   /**
    * @description 通过wxId查询是否已经有用户了。
    * @param wxId string
@@ -30,6 +47,10 @@ export class UserService {
    */
   async findUserByWxId(wxId: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { wxId } });
+  }
+
+  async findUserByEmail(email: string): Promise<User | undefined> {
+    return this.userRepository.findOne({ where: { email } });
   }
 
   async updateUser(

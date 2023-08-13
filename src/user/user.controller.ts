@@ -6,22 +6,17 @@ import {
   Delete,
   Param,
   Body,
+  UsePipes,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '../connect/user.entity';
-import { AuthGuard } from '../guard/auth.guard';
 import { UserStatus, WeChatErrorCode } from '../common/enmu';
 import { WeChatService } from '../wx/api';
 import { JwtCommonService } from 'src/auth/jwt.common.service';
-
-/**
- * 用户登录或者创建返回值
- */
-interface UserReturn {
-  userName: string;
-  token: string;
-}
+import { ValidateEmailPipe } from 'src/pipe/validate.email.pipe';
+import * as resultHelper from 'src/common/resultHelper';
+import { AuthGuard } from 'src/guard/auth.guard';
 
 @Controller('users')
 export class UserController {
@@ -32,19 +27,21 @@ export class UserController {
   ) {}
 
   @Get()
-  //@UseGuards(AuthGuard)
-  async getAllUsers(): Promise<User[]> {
-    return this.userService.findAllUsers();
+  @UseGuards(AuthGuard)
+  async getAllUsers() {
+    const users = this.userService.findAllUsers();
+    return resultHelper.success(users);
   }
 
   @Get('/:id')
-  //@UseGuards(AuthGuard)
-  async getUserById(@Param('id') id: number): Promise<User | undefined> {
-    return this.userService.findUserById(id);
+  @UseGuards(AuthGuard)
+  async getUserById(@Param('id') id: number) {
+    const user = this.userService.findUserById(id);
+    return resultHelper.success(user);
   }
 
   @Post()
-  async createWxUser(wxId: string): Promise<User> {
+  async createWxUser(wxId: string) {
     const reuslt = await this.weChatService.getSession(wxId);
 
     if (reuslt.errcode === WeChatErrorCode.InvalidCode) {
@@ -65,12 +62,10 @@ export class UserController {
 
     const newUser = new User();
     newUser.wxId = reuslt.unionid;
-    newUser.name = this.generateRandomName(); // 生成随机名称
-    newUser.createTime = new Date(); // 自动填写创建时间
-    newUser.activeTime = new Date(); // 暂未激活，设置为 null
     newUser.status = UserStatus.wxUser;
 
-    return this.userService.createUser(newUser);
+    const u = this.userService.createUser(newUser);
+    return resultHelper.success(u);
   }
 
   /**
@@ -79,7 +74,7 @@ export class UserController {
    * @returns UserReturn
    */
   @Post('/login/wx/:id')
-  async loginWxUserByUnionid(@Param('id') id: string): Promise<UserReturn> {
+  async loginWxUserByUnionid(@Param('id') id: string) {
     const wxId = id;
     const existUser = await this.userService.findUserByWxId(wxId);
     if (!!existUser) {
@@ -96,46 +91,45 @@ export class UserController {
 
     const newUser = new User();
     newUser.wxId = wxId;
-    newUser.name = this.generateRandomName(); // 生成随机名称
-    newUser.createTime = new Date(); // 自动填写创建时间
-    newUser.activeTime = new Date(); // 暂未激活，设置为 null
     newUser.status = UserStatus.wxUser;
 
     try {
       const u = await this.userService.createUser(newUser);
       const token = this.jwtService.generateToken(newUser);
 
-      return {
+      return resultHelper.success({
         userName: u.name,
         token: token,
-      };
-    } catch (ex) {}
-  }
-
-  private generateRandomName(): string {
-    const prefix = 'User';
-    const randomSuffix = Math.floor(Math.random() * 100000).toString();
-    const username = prefix + randomSuffix.padStart(5, '0');
-    return username;
+      });
+    } catch (ex) {
+      return resultHelper.error(500, ex.message);
+    }
   }
 
   @Put(':id')
-  //@UseGuards(AuthGuard)
-  async updateUser(
-    @Param('id') id: number,
-    @Body() userData: Partial<User>,
-  ): Promise<User | undefined> {
-    return this.userService.updateUser(id, userData);
+  @UseGuards(AuthGuard)
+  async updateUser(@Param('id') id: number, @Body() userData: Partial<User>) {
+    try {
+      const user = this.userService.updateUser(id, userData);
+      return resultHelper.success(user);
+    } catch (error) {
+      return resultHelper.error(500, error.message);
+    }
   }
 
   @Delete(':id')
-  //@UseGuards(AuthGuard)
-  async deleteUser(@Param('id') id: number): Promise<boolean> {
-    return this.userService.deleteUser(id);
+  @UseGuards(AuthGuard)
+  async deleteUser(@Param('id') id: number) {
+    try {
+      this.userService.deleteUser(id);
+      return resultHelper.success();
+    } catch (error) {
+      return resultHelper.error(500, error.message);
+    }
   }
 
   @Put(':id/status')
-  //@UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   async updateUserStatus(
     @Param('id') id: number,
     @Body('status') status: number,
@@ -143,16 +137,18 @@ export class UserController {
     return this.userService.updateUserStatus(id, status);
   }
 
-  @Put(':id/active-time')
-  //@UseGuards(AuthGuard)
+  @Put(':id/active/time')
+  @UseGuards(AuthGuard)
   async updateUserActiveTime(
     @Param('id') id: number,
   ): Promise<User | undefined> {
     return this.userService.updateUserActiveTime(id);
   }
 
-  @Get('test')
-  async test() {
-    return 'test11111111111111111';
+  @Get('check/email/:email')
+  @UsePipes(ValidateEmailPipe)
+  async checkEmail(@Param('email') email: string) {
+    const user = await this.userService.findUserByEmail(email);
+    return !user;
   }
 }

@@ -2,6 +2,7 @@ export enum UserStatus {
   normal = 1,
   wxUser = 2,
   disable = 3,
+  noVerification = 4,
 }
 
 export enum WeChatErrorCode {
