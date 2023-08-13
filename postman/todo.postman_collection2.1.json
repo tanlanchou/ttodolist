@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7570f528-09e4-45a8-868b-5b0be24f8c09",
+		"_postman_id": "4e0d09d1-1859-43e5-9c6d-79a48868ef78",
 		"name": "todo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "4818623"
@@ -136,6 +136,208 @@
 						"lists",
 						"all",
 						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "用户注册",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{login.email}}\",\r\n  \"password\": \"e10adc3949ba59abbe56e057f20f883e\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{todoUrl}}/login/email/register",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"login",
+						"email",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "确认用户",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{todoUrl}}/login/email/confirm/8/1691918802336/47b8cbfac6506d44f8924c6c1b989821",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"login",
+						"email",
+						"confirm",
+						"8",
+						"1691918802336",
+						"47b8cbfac6506d44f8924c6c1b989821"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "用户登录",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{login.email}}\",\r\n  \"password\": \"25d55ad283aa400af464c76d713c07ad\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{todoUrl}}/login/email/login",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"login",
+						"email",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "更改密码",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"oldPassword\": \"e10adc3949ba59abbe56e057f20f883e\",\r\n  \"newPassword\": \"fcea920f7412b5da7be0cf42b8c93759\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{todoUrl}}/login/email/change/password",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"login",
+						"email",
+						"change",
+						"password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "发送忘记密码邮件",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{login.email}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{todoUrl}}/login/email/forget/send",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"login",
+						"email",
+						"forget",
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "重置密码",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"password\": \"25d55ad283aa400af464c76d713c07ad\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{todoUrl}}/login/email/reset/password/8/1691918802336/47b8cbfac6506d44f8924c6c1b989821",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"login",
+						"email",
+						"reset",
+						"password",
+						"8",
+						"1691918802336",
+						"47b8cbfac6506d44f8924c6c1b989821"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "邮件重发",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{login.email}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{todoUrl}}/login/email/resend",
+					"host": [
+						"{{todoUrl}}"
+					],
+					"path": [
+						"login",
+						"email",
+						"resend"
 					]
 				}
 			},
