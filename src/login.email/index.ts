@@ -16,7 +16,7 @@ import {
   ForgetPasswordDto,
 } from './login.dto';
 import { User } from 'src/connect/user.entity';
-import { UserStatus } from 'src/common/enmu';
+import { UserStatus, tokenMixin } from 'src/common/enmu';
 import { MailService } from 'src/common/mail.service';
 import { TempTokenService } from 'src/auth/temp.token.service';
 import { ConfigService } from '@nestjs/config';
@@ -53,12 +53,16 @@ export class LoginEmailController {
       const newUser = await this.userService.createUser(user);
       const curTimeSpan = new Date().getTime();
       const token = this.tempTokenService.generateToken(
-        user.name + user.createTime,
+        user.name +
+          (this.configService.get<string>(`tokenMixin`) || tokenMixin),
         curTimeSpan,
       );
-      const url = `${this.configService.get('HOST')}/login/email/confirm/${
+      const url = `${this.configService.get(
+        'FRONT',
+      )}/register/email/confirm?id=${
         newUser.id
-      }/${curTimeSpan}/${token}`;
+      }&&timespan=${curTimeSpan}&&token=${token}`;
+      console.log(`url`, url);
 
       const template = MailService.getEmailTemplate(user.email, url);
       await this.mailService.sendEmail(
@@ -80,7 +84,8 @@ export class LoginEmailController {
 
       const curTimeSpan = new Date().getTime();
       const token = this.tempTokenService.generateToken(
-        user.name + user.createTime,
+        user.name +
+          (this.configService.get<string>(`tokenMixin`) || tokenMixin),
         curTimeSpan,
       );
 
@@ -172,7 +177,8 @@ export class LoginEmailController {
 
       const curTimeSpan = new Date().getTime();
       const token = this.tempTokenService.generateToken(
-        user.name + user.createTime,
+        user.name +
+          (this.configService.get<string>(`tokenMixin`) || tokenMixin),
         curTimeSpan,
       );
 

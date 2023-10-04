@@ -1,6 +1,8 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { TempTokenService } from 'src/auth/temp.token.service';
+import { tokenMixin } from 'src/common/enmu';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -8,6 +10,7 @@ export class TempTokenGuard implements CanActivate {
   constructor(
     private readonly tempTokenService: TempTokenService,
     private readonly userService: UserService,
+    private readonly configService: ConfigService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -28,7 +31,8 @@ export class TempTokenGuard implements CanActivate {
       }
 
       const caleToken = this.tempTokenService.generateToken(
-        user.name + user.createTime,
+        user.name +
+          (this.configService.get<string>(`tokenMixin`) || tokenMixin),
         timeSpan,
       );
 
