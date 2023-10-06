@@ -129,7 +129,11 @@ export class LoginEmailController {
       if (user.status === UserStatus.disable) {
         return resultHelper.error(500, `用户已被禁用`);
       } else if (user.status === UserStatus.noVerification) {
-        return resultHelper.error(500, `用户没有激活`);
+        this.resendEmail(user.email);
+        return resultHelper.error(
+          500,
+          `用户没有激活, 已重新为您发送了激活邮件`,
+        );
       }
       const newUser = await this.userService.updateUserActiveTime(user.id);
       const token = this.jwtService.generateToken(newUser);
