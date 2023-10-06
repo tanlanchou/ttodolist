@@ -7,11 +7,8 @@ WORKDIR /app
 # 复制当前目录的所有文件到容器的工作目录
 COPY . .
 
-# 安装 cnpm
-RUN npm install -g cnpm
-
 # 使用 cnpm 安装依赖
-RUN cnpm install
+RUN npm install --registry=https://registry.npmmirror.com
 
 # 执行 npm run build
 RUN npm run build

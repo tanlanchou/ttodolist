@@ -21,3 +21,5 @@ export enum Status {
   Normal = 1,
   Deleted = 2,
 }
+
+export const tokenMixin = `dsjioj@!J*@&(#JKHDUH&@)`;
