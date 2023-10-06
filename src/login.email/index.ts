@@ -182,9 +182,9 @@ export class LoginEmailController {
         curTimeSpan,
       );
 
-      const url = `http://${this.configService.get(
-        'HOST',
-      )}/login/email/reset/password/${user.id}/${curTimeSpan}/${token}`;
+      const url = `${this.configService.get('FRONT')}/forget/password?id=${
+        user.id
+      }&&timeSpan=${curTimeSpan}&&token=${token}`;
 
       const template = MailService.getForgetEmailTemplate(email, url); // 你需要创建一个相应的邮件模板生成方法
       await this.mailService.sendEmail(
